@@ -1,4 +1,3 @@
-
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('QR Check Point Daily Report')
