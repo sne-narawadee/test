@@ -1,1 +1,21 @@
-https://script.google.com/macros/s/AKfycbzfSb57nuCLFsa9V8doJGjpg-a0FvXQd2Dud52TTrulDlZDXAdt80czV9-v6kvEFkW6EQ/exec
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SNE-eDocument</title>
+</head>
+<body style="padding: 0; margin: 0;">
+<table id="data-table" style="width: 100%;"></table>
+
+<script>
+  fetch('https://script.google.com/macros/s/AKfycbzfSb57nuCLFsa9V8doJGjpg-a0FvXQd2Dud52TTrulDlZDXAdt80czV9-v6kvEFkW6EQ/exec')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('data-table').innerHTML = data;
+    })
+    .catch(error => console.error('Error fetching data:', error));
+</script>
+
+</body>
+</html>
