@@ -28,6 +28,10 @@
         function onScanSuccess(decodedText, decodedResult) {
             // handle success
             document.getElementById('result').innerText = decodedText;
+            // Optionally stop scanning after successful scan
+            html5QrCode.stop().catch(err => {
+                console.error("Failed to stop scanning: ", err);
+            });
         }
 
         function onScanFailure(error) {
@@ -37,6 +41,7 @@
 
         const html5QrCode = new Html5Qrcode("qr-reader");
 
+        // Start scanning
         html5QrCode.start(
             { facingMode: "environment" }, // Choose the back camera
             {
@@ -47,6 +52,13 @@
             onScanFailure
         ).catch(err => {
             console.error(`Error starting QR code scanner: ${err}`);
+        });
+
+        // Ensure to stop the scanner when the page is unloaded
+        window.addEventListener("beforeunload", () => {
+            html5QrCode.stop().catch(err => {
+                console.error("Failed to stop scanning: ", err);
+            });
         });
     </script>
 </body>
