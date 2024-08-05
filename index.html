@@ -1,61 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>QR Scanner</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <style>
-        #video-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
+        #qr-reader {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
         }
-        #video {
-            width: 300px;
-            height: 300px;
-            border: 1px solid black;
+        #qr-reader-results {
+            margin-top: 10px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h1>QR Scanner</h1>
-    <div id="video-container">
-        <video id="video" autoplay></video>
+    <h1>QR Code Scanner</h1>
+    <div id="qr-reader"></div>
+    <div id="qr-reader-results">
+        <p>Result: <span id="result">Scan a QR code to see the result</span></p>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsqr.min.js"></script>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function(event) {
-            var video = document.getElementById('video');
-            var canvas = document.createElement('canvas');
-            var context = canvas.getContext('2d');
+        function onScanSuccess(decodedText, decodedResult) {
+            // handle success
+            document.getElementById('result').innerText = decodedText;
+        }
 
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-                .then(function(stream) {
-                    video.srcObject = stream;
-                    video.play();
-                    // Set canvas size to video size
-                    video.addEventListener('loadedmetadata', function() {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                    });
-                })
-                .catch(function(err) {
-                    console.log("An error occurred: " + err);
-                });
+        function onScanFailure(error) {
+            // handle scan failure, usually better to ignore
+            console.warn(`QR code scan error: ${error}`);
+        }
 
-            video.addEventListener('play', function() {
-                var interval = setInterval(function() {
-                    if (video.paused || video.ended) {
-                        return;
-                    }
-                    // Draw video frame to canvas
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                    var code = jsQR(imageData.data, canvas.width, canvas.height);
-                    if (code) {
-                        clearInterval(interval);
-                        alert("QR Code detected: " + code.data);
-                    }
-                }, 100);
-            });
+        const html5QrCode = new Html5Qrcode("qr-reader");
+
+        html5QrCode.start(
+            { facingMode: "environment" }, // Choose the back camera
+            {
+                fps: 10,    // Optional, frame per second for the scan
+                qrbox: 250  // Optional, qrbox size in pixels
+            },
+            onScanSuccess,
+            onScanFailure
+        ).catch(err => {
+            console.error(`Error starting QR code scanner: ${err}`);
         });
     </script>
 </body>
