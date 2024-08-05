@@ -18,43 +18,45 @@
 <body>
     <h1>QR Scanner</h1>
     <div id="video-container">
-        <video id="video"></video>
+        <video id="video" autoplay></video>
     </div>
-    <script src="https://rawgit.com/sitepoint-editors/jsqrcode/master/src/qr_packed.js"></script>
-    <script src="script.js"></script>
-</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsqr.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            var video = document.getElementById('video');
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
 
-<script>
-document.addEventListener("DOMContentLoaded", function(event) {
-    var video = document.getElementById('video');
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+                    // Set canvas size to video size
+                    video.addEventListener('loadedmetadata', function() {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                    });
+                })
+                .catch(function(err) {
+                    console.log("An error occurred: " + err);
+                });
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-        .then(function(stream) {
-            video.srcObject = stream;
-            video.play();
-        })
-        .catch(function(err) {
-            console.log("An error occurred: " + err);
+            video.addEventListener('play', function() {
+                var interval = setInterval(function() {
+                    if (video.paused || video.ended) {
+                        return;
+                    }
+                    // Draw video frame to canvas
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    var code = jsQR(imageData.data, canvas.width, canvas.height);
+                    if (code) {
+                        clearInterval(interval);
+                        alert("QR Code detected: " + code.data);
+                    }
+                }, 100);
+            });
         });
-
-    video.addEventListener('play', function() {
-        var interval = setInterval(function() {
-            if (video.paused || video.ended) {
-                return;
-            }
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            var code = jsQR(imageData.data, imageData.width, imageData.height);
-            if (code) {
-                clearInterval(interval);
-                alert("QR Code detected: " + code.data);
-            }
-        }, 100);
-    });
-});
-
-</script>
-
+    </script>
+</body>
 </html>
