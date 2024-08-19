@@ -79,7 +79,14 @@
                 });
                 
                 if (code) {
-                    result.textContent = `QR Code Data: ${code.data}`;
+                    const qrData = code.data;
+                    // Check if the QR code data is a valid URL
+                    try {
+                        new URL(qrData); // Validates if qrData is a URL
+                        window.location.href = qrData; // Redirect to URL
+                    } catch (e) {
+                        result.textContent = `QR Code Data: ${qrData}`; // Not a URL
+                    }
                 } else {
                     result.textContent = 'Scanning...';
                 }
@@ -91,8 +98,8 @@
     </script>
 </body>
 </html>
-
 -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -103,7 +110,9 @@
         body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         #video { display: none; }
         #canvas { display: none; }
-        #result { margin-top: 20px; }
+        #result { margin-top: 20px; font-size: 18px; }
+        .error { color: red; }
+        .success { color: green; }
     </style>
 </head>
 <body>
@@ -127,6 +136,7 @@
                 requestAnimationFrame(tick);
             } catch (error) {
                 result.textContent = 'Error accessing camera: ' + error.message;
+                result.classList.add('error');
             }
         }
 
@@ -143,15 +153,18 @@
                 
                 if (code) {
                     const qrData = code.data;
-                    // Check if the QR code data is a valid URL
                     try {
                         new URL(qrData); // Validates if qrData is a URL
                         window.location.href = qrData; // Redirect to URL
                     } catch (e) {
                         result.textContent = `QR Code Data: ${qrData}`; // Not a URL
+                        result.classList.remove('error');
+                        result.classList.add('success');
                     }
                 } else {
-                    result.textContent = 'Scanning...';
+                    result.textContent = 'QR Code not found!!!';
+                    result.classList.remove('success');
+                    result.classList.add('error');
                 }
             }
             requestAnimationFrame(tick);
@@ -161,6 +174,7 @@
     </script>
 </body>
 </html>
+
 
 
 
