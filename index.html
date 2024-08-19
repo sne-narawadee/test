@@ -160,6 +160,11 @@
             }, 3000); // Toggle every 3 seconds
         }
 
+        function stopMessageToggle() {
+            clearInterval(scanInterval);
+            result.textContent = ''; // Clear any remaining message
+        }
+
         function tick() {
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 canvas.width = video.videoWidth;
@@ -175,18 +180,21 @@
                     const qrData = code.data;
                     try {
                         new URL(qrData); // Validates if qrData is a URL
-                        clearInterval(scanInterval); // Stop message toggle
+                        stopMessageToggle(); // Stop message toggle
                         window.location.href = qrData; // Redirect to URL
                     } catch (e) {
-                        clearInterval(scanInterval); // Stop message toggle
+                        stopMessageToggle(); // Stop message toggle
                         result.textContent = `QR Code Data: ${qrData}`; // Not a URL
                         result.classList.remove('error');
                         result.classList.add('success');
                     }
                 } else {
-                    result.textContent = 'QR Code not found!!!';
-                    result.classList.remove('success');
-                    result.classList.add('error');
+                    // Only update the message if it's not currently displaying the 'QR Code not found!!!' message
+                    if (result.textContent !== 'QR Code not found!!!') {
+                        result.textContent = 'QR Code not found!!!';
+                        result.classList.remove('success');
+                        result.classList.add('error');
+                    }
                 }
             }
             requestAnimationFrame(tick);
@@ -196,7 +204,3 @@
     </script>
 </body>
 </html>
-
-
-
-
